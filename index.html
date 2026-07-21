@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tuggr — Pulling Potential Forward</title>
+<meta name="description" content="Tuggr is a quality-first recruitment partner. We don't chase resumes — we pull the right people toward the right roles, and keep pulling long after the offer's signed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Archivo+Black&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black: #0c0c0e;
+    --black-soft: #151417;
+    --maroon: #3a0c10;
+    --maroon-2: #5c1015;
+    --red: #e0202b;
+    --red-2: #ff3b45;
+    --white: #faf8f5;
+    --white-dim: #eeece7;
+    --grey: #9a989c;
+    --grey-dark: #58565b;
+    --line: rgba(250,248,245,0.12);
+    --line-dark: rgba(12,12,14,0.12);
+    --font-display: 'Archivo Black', 'Archivo', sans-serif;
+    --font-head: 'Archivo', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  a{ color:inherit; text-decoration:none; }
+  ul{ list-style:none; }
+  img{ max-width:100%; display:block; }
+  ::selection{ background: var(--red); color:var(--white); }
+
+  :focus-visible{ outline: 2px solid var(--red); outline-offset: 3px; }
+
+  .wrap{ max-width: 1240px; margin: 0 auto; padding: 0 32px; }
+
+  /* ---------- ROPE MOTIF ---------- */
+  .rope{
+    height: 7px;
+    width: 100%;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--black) 0px, var(--black) 9px,
+      var(--red) 9px, var(--red) 16px,
+      var(--white) 16px, var(--white) 18px
+    );
+    background-size: 200% 100%;
+    animation: ropeShift 6s linear infinite;
+  }
+  .rope.on-dark{ opacity:0.9; }
+  @keyframes ropeShift{
+    from{ background-position: 0 0; }
+    to{ background-position: -100px 0; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .rope{ animation:none; }
+  }
+
+  /* ---------- NAV ---------- */
+  header{
+    position: fixed; top:0; left:0; right:0; z-index: 100;
+    padding: 20px 0;
+    transition: background .35s ease, padding .35s ease, backdrop-filter .35s ease;
+  }
+  header.scrolled{
+    background: rgba(12,12,14,0.85);
+    backdrop-filter: blur(10px);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-row{ display:flex; align-items:center; justify-content:space-between; }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand img{ height: 34px; width:auto; }
+  .brand-word{ font-family: var(--font-head); font-weight:900; font-size: 1.35rem; letter-spacing: -0.02em; }
+  .brand-word .r{ color: var(--red); }
+  nav ul{ display:flex; gap: 34px; align-items:center; }
+  nav a{
+    font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase;
+    font-weight:600; color: var(--grey); transition: color .2s ease;
+    position:relative;
+  }
+  nav a:hover{ color: var(--white); }
+  .nav-cta{
+    background: var(--red); color: var(--white) !important; padding: 10px 20px;
+    border-radius: 2px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; font-size:.78rem;
+    transition: background .2s ease, transform .2s ease;
+  }
+  .nav-cta:hover{ background: var(--red-2); transform: translateY(-1px); }
+  .burger{ display:none; background:none; border:none; color:var(--white); font-size:1.6rem; cursor:pointer; }
+
+  @media (max-width: 880px){
+    nav ul.desktop-links{ display:none; }
+    .burger{ display:block; }
+  }
+
+  .mobile-menu{
+    position: fixed; inset:0; background: var(--black); z-index: 200;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap: 28px;
+    transform: translateY(-110%); transition: transform .4s ease;
+  }
+  .mobile-menu.open{ transform: translateY(0); }
+  .mobile-menu a{ font-family: var(--font-head); font-size: 1.6rem; font-weight:700; }
+  .mobile-menu .close-btn{ position:absolute; top:24px; right:28px; font-size:2rem; background:none; border:none; color:var(--white); cursor:pointer; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height: 100vh;
+    display:flex; flex-direction:column; justify-content:center;
+    padding-top: 140px; padding-bottom: 80px;
+    position: relative;
+    background:
+      radial-gradient(ellipse 60% 50% at 85% 15%, rgba(224,32,43,0.16), transparent 60%),
+      var(--black);
+  }
+  .eyebrow{
+    font-family: var(--font-mono); font-size: .78rem; letter-spacing: .18em; text-transform:uppercase;
+    color: var(--red); display:flex; align-items:center; gap: 10px; margin-bottom: 22px;
+  }
+  .eyebrow::before{ content:''; width: 26px; height:2px; background: var(--red); display:inline-block; }
+
+  .hero h1{
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 6.4rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    max-width: 900px;
+  }
+  .hero h1 .accent{ color: var(--red); }
+  .hero-sub{
+    margin-top: 26px; max-width: 560px; font-size: 1.15rem; line-height:1.6; color: var(--grey);
+  }
+  .hero-ctas{ display:flex; gap:18px; margin-top: 40px; flex-wrap:wrap; }
+  .btn{
+    font-weight:700; text-transform:uppercase; letter-spacing:.05em; font-size:.82rem;
+    padding: 16px 30px; border-radius:2px; display:inline-flex; align-items:center; gap:10px;
+    transition: transform .2s ease, background .2s ease, border-color .2s ease;
+  }
+  .btn-primary{ background: var(--red); color:var(--white); }
+  .btn-primary:hover{ background: var(--red-2); transform: translateY(-2px); }
+  .btn-ghost{ border: 1px solid var(--line); color: var(--white); }
+  .btn-ghost:hover{ border-color: var(--red); color: var(--red); }
+
+  /* --- tug interactive --- */
+  .tug-module{
+    margin-top: 64px; max-width: 620px;
+    border: 1px solid var(--line); padding: 28px 28px 24px;
+    background: rgba(255,255,255,0.02);
+  }
+  .tug-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:18px; }
+  .tug-hint{ font-family: var(--font-mono); font-size:.72rem; color:var(--grey); letter-spacing:.08em; text-transform:uppercase; }
+  .tug-status{
+    font-family: var(--font-head); font-weight:800; font-size: 1.15rem; color: var(--white);
+    min-width: 150px; text-align:right;
+  }
+  .tug-status .dot{ color: var(--red); }
+
+  .tug-track-wrap{ position:relative; height: 46px; display:flex; align-items:center; }
+  .tug-track-bg{
+    position:absolute; left:0; right:0; height:8px; border-radius:6px; overflow:hidden;
+    background: repeating-linear-gradient(-45deg, #2a2a2e 0 8px, #3a393d 8px 14px);
+  }
+  .tug-track-fill{
+    position:absolute; left:0; height:8px; border-radius:6px; width:8%;
+    background: linear-gradient(90deg, var(--black-soft), var(--red));
+    transition: width .05s linear;
+  }
+  input[type="range"].tug-slider{
+    -webkit-appearance:none; appearance:none; width:100%; height:46px; background:transparent;
+    position:relative; z-index:2; cursor:grab;
+  }
+  input[type="range"].tug-slider:active{ cursor:grabbing; }
+  input[type="range"].tug-slider::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width: 30px; height:30px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #fff2 0, transparent 40%), conic-gradient(var(--black) 0 25%, var(--red) 25% 50%, var(--black) 50% 75%, var(--red) 75% 100%);
+    border: 3px solid var(--white);
+    box-shadow: 0 0 0 2px var(--black), 0 4px 10px rgba(0,0,0,.5);
+    cursor:grab;
+  }
+  input[type="range"].tug-slider::-moz-range-thumb{
+    width: 30px; height:30px; border-radius:50%; border: 3px solid var(--white);
+    background: conic-gradient(var(--black) 0 25%, var(--red) 25% 50%, var(--black) 50% 75%, var(--red) 75% 100%);
+    box-shadow: 0 0 0 2px var(--black);
+    cursor:grab;
+  }
+  .tug-labels{ display:flex; justify-content:space-between; margin-top:12px; font-family: var(--font-mono); font-size:.68rem; color: var(--grey-dark); letter-spacing:.05em; text-transform:uppercase; }
+
+  /* ---------- SECTIONS ---------- */
+  section{ padding: 120px 0; position:relative; }
+  .section-dark{ background: var(--black); }
+  .section-light{ background: var(--white); color: var(--black); }
+  .section-light .eyebrow{ color: var(--red); }
+  .section-light .grey-text{ color: var(--grey-dark); }
+
+  .reveal{ opacity:0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.visible{ opacity:1; transform:none; }
+
+  h2.section-title{
+    font-family: var(--font-head); font-weight:900; font-size: clamp(2rem, 4.2vw, 3.2rem);
+    letter-spacing:-0.01em; margin-bottom: 28px; max-width: 720px;
+  }
+  .lede{ font-size: 1.1rem; line-height:1.7; max-width: 640px; color: var(--grey); margin-bottom: 18px; }
+  .section-light .lede{ color: #44424a; }
+
+  .quote-line{
+    font-family: var(--font-display); font-size: clamp(1.6rem, 4vw, 2.6rem);
+    color: var(--red); line-height:1.15; margin-top: 40px; opacity:.92;
+  }
+
+  /* Philosophy grid */
+  .phil-grid{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 50px;
+    background: var(--line-dark);
+    border: 1px solid var(--line-dark);
+  }
+  .phil-card{
+    background: var(--white); padding: 34px 26px; min-height: 160px;
+    display:flex; flex-direction:column; justify-content:flex-end; gap:14px;
+    transition: background .25s ease, transform .25s ease;
+    position:relative; overflow:hidden;
+  }
+  .phil-card::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:3px; background: var(--red);
+    transform: scaleX(0); transform-origin:left; transition: transform .3s ease;
+  }
+  .phil-card:hover{ background: var(--maroon); transform: translateY(-4px); }
+  .phil-card:hover::before{ transform: scaleX(1); }
+  .phil-card:hover .phil-name{ color: var(--white); }
+  .phil-card:hover .phil-tag{ color: var(--red-2); }
+  .phil-tag{ font-family: var(--font-mono); font-size:.68rem; letter-spacing:.1em; color: var(--red); text-transform:uppercase; }
+  .phil-name{ font-family: var(--font-head); font-weight:700; font-size: 1.15rem; color: var(--black); transition: color .25s ease; }
+
+  @media (max-width: 760px){ .phil-grid{ grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 480px){ .phil-grid{ grid-template-columns: 1fr; } }
+
+  /* Process rope timeline */
+  .process-scroll{ margin-top: 70px; overflow-x:auto; padding-bottom: 20px; }
+  .process-line{
+    display:flex; min-width: 980px; position:relative; padding-top: 10px;
+  }
+  .process-line .rope-track{
+    position:absolute; top: 27px; left: 0; right:0; height:6px;
+    background: repeating-linear-gradient(-45deg, var(--black) 0 8px, var(--red) 8px 14px, var(--white-dim) 14px 16px);
+  }
+  .stage{
+    flex:1; padding: 0 18px; position:relative; z-index:2;
+  }
+  .stage-knot{
+    width: 40px; height:40px; border-radius:50%; background: var(--black);
+    border: 3px solid var(--red); display:flex; align-items:center; justify-content:center;
+    font-family: var(--font-mono); font-weight:700; font-size: .9rem; color: var(--white);
+    margin-bottom: 22px; transition: background .25s ease, transform .25s ease;
+  }
+  .stage:hover .stage-knot{ background: var(--red); transform: scale(1.1); }
+  .stage-title{ font-family: var(--font-head); font-weight:800; font-size: 1.05rem; margin-bottom: 12px; }
+  .stage-list{ font-size:.88rem; color: var(--grey); line-height:1.9; }
+  .stage-list li::before{ content:'—'; color: var(--red); margin-right:8px; }
+
+  @media (max-width: 880px){
+    .process-line{ flex-direction:column; min-width:0; gap: 44px; }
+    .process-line .rope-track{ display:none; }
+    .stage{ padding:0; }
+  }
+
+  /* Industries chip cloud */
+  .chip-cloud{ display:flex; flex-wrap:wrap; gap: 14px; margin-top: 50px; }
+  .chip{
+    font-family: var(--font-head); font-weight:700; font-size: .95rem;
+    padding: 14px 24px; border: 1.5px solid var(--black); color: var(--black);
+    border-radius: 40px; transition: all .25s ease; cursor:default;
+  }
+  .chip:nth-child(3n){ border-color: var(--red); }
+  .chip:nth-child(4n){ transform: rotate(-1.5deg); }
+  .chip:nth-child(5n){ transform: rotate(1.5deg); }
+  .chip:hover{ background: var(--red); border-color: var(--red); color:var(--white); transform: translateY(-3px) rotate(0deg); }
+
+  /* Why grid */
+  .why-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap: 2px; margin-top: 50px; background: var(--line); }
+  .why-card{
+    background: var(--black); padding: 30px 28px; border-left: 3px solid var(--red);
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .why-num{ font-family: var(--font-mono); color: var(--grey-dark); font-size: .78rem; }
+  .why-title{ font-family: var(--font-head); font-weight:800; font-size: 1.1rem; }
+  @media (max-width: 700px){ .why-grid{ grid-template-columns: 1fr; } }
+
+  /* Commitment */
+  .commit-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap: 26px; margin-top:50px; }
+  .commit-card{
+    padding: 34px 28px; border-top: 3px solid var(--red); background: rgba(255,255,255,0.03);
+  }
+  .commit-card h3{ font-family: var(--font-head); font-size: 1.4rem; margin-bottom: 14px; }
+  .commit-card p{ color: var(--grey); line-height:1.6; }
+  @media (max-width: 780px){ .commit-grid{ grid-template-columns: 1fr; } }
+
+  /* Contact / footer */
+  .contact-section{
+    background: linear-gradient(180deg, var(--black) 0%, var(--maroon) 130%);
+  }
+  .contact-inner{ display:flex; justify-content:space-between; gap: 60px; flex-wrap:wrap; align-items:flex-end; }
+  .contact-left h2{ max-width: 620px; }
+  .contact-card{
+    background: var(--maroon-2); padding: 30px 34px; min-width: 280px;
+    border-left: 4px solid var(--red);
+  }
+  .contact-card .name{ font-family: var(--font-head); font-weight:800; font-size:1.3rem; }
+  .contact-card .role{ color: var(--grey); margin-bottom: 18px; font-size:.9rem; }
+  .contact-card a{ display:block; color: var(--red-2); font-weight:600; margin-top:8px; transition: color .2s ease; }
+  .contact-card a:hover{ color:var(--white); }
+
+  footer{ padding: 40px 0; border-top: 1px solid var(--line); }
+  .foot-row{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+  .foot-brand{ display:flex; align-items:center; gap:8px; font-family: var(--font-mono); font-size:.8rem; color:var(--grey); }
+  .foot-tag{ font-family: var(--font-mono); font-size:.75rem; color: var(--grey-dark); letter-spacing:.05em; }
+
+  @media (max-width: 600px){
+    .wrap{ padding: 0 20px; }
+    section{ padding: 80px 0; }
+    .phil-grid{ margin-top:36px; }
+  }
+</style>
+</head>
+<body>
+
+<header id="siteHeader">
+  <div class="wrap nav-row">
+    <a href="#home" class="brand">
+      <img src="tuggr-logo.png" alt="Tuggr logomark">
+      <span class="brand-word">tuggr<span class="r">r</span></span>
+    </a>
+    <nav>
+      <ul class="desktop-links">
+        <li><a href="#who">Who We Are</a></li>
+        <li><a href="#philosophy">Philosophy</a></li>
+        <li><a href="#process">Process</a></li>
+        <li><a href="#industries">Industries</a></li>
+        <li><a href="#why">Why Tuggr</a></li>
+        <li><a href="#contact" class="nav-cta">Start a Search</a></li>
+      </ul>
+    </nav>
+    <button class="burger" id="burgerBtn" aria-label="Open menu">☰</button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="close-btn" id="closeMenu" aria-label="Close menu">×</button>
+  <a href="#who">Who We Are</a>
+  <a href="#philosophy">Philosophy</a>
+  <a href="#process">Process</a>
+  <a href="#industries">Industries</a>
+  <a href="#why">Why Tuggr</a>
+  <a href="#contact">Start a Search</a>
+</div>
+
+<main>
+
+  <section class="hero" id="home">
+    <div class="wrap">
+      <div class="eyebrow">Recruitment, reimagined</div>
+      <h1>Pulling potential<br>forward<span class="accent">.</span></h1>
+      <p class="hero-sub">We don't chase resumes and we don't flood inboxes. We pull the right people toward the right roles — and keep pulling long after the offer's signed.</p>
+      <div class="hero-ctas">
+        <a href="#contact" class="btn btn-primary">Start a search →</a>
+        <a href="#process" class="btn btn-ghost">See how we work</a>
+      </div>
+
+      <div class="tug-module">
+        <div class="tug-top">
+          <span class="tug-hint">Drag the knot — watch a hire happen</span>
+          <span class="tug-status" id="tugStatus">Sourced</span>
+        </div>
+        <div class="tug-track-wrap">
+          <div class="tug-track-bg"></div>
+          <div class="tug-track-fill" id="tugFill"></div>
+          <input type="range" class="tug-slider" id="tugSlider" min="0" max="100" value="8" aria-label="Recruitment progress — drag to pull a candidate forward">
+        </div>
+        <div class="tug-labels">
+          <span>Candidate</span>
+          <span>Screened</span>
+          <span>Interviewed</span>
+          <span>Offer</span>
+          <span>Colleague</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="rope on-dark"></div>
+
+  <section class="section-dark" id="who">
+    <div class="wrap reveal">
+      <div class="eyebrow">Who we are</div>
+      <h2 class="section-title">Finding the right talent shouldn't feel like searching for a needle in a haystack.</h2>
+      <p class="lede">At Tuggr, we partner with growing businesses to simplify recruitment through a structured, quality-first hiring approach. We don't believe recruitment ends when an offer is accepted — it begins by understanding your business, your culture, and the type of people who thrive within it.</p>
+      <p class="lede">Every search is approached with the mindset of becoming an extension of your internal hiring team. Whether you're hiring one strategic employee or building an entire business unit, our focus remains the same.</p>
+      <p class="quote-line">Quality over quantity.</p>
+    </div>
+  </section>
+
+  <section class="section-light" id="philosophy">
+    <div class="wrap reveal">
+      <div class="eyebrow">Our philosophy</div>
+      <h2 class="section-title">Most agencies optimize for submissions. We optimize for the pull that lasts.</h2>
+      <p class="lede grey-text">Before presenting a candidate, we evaluate far more than a résumé. Our screening framework holds every candidate up against nine points of tension:</p>
+
+      <div class="phil-grid">
+        <div class="phil-card"><span class="phil-tag">01</span><span class="phil-name">Communication Skills</span></div>
+        <div class="phil-card"><span class="phil-tag">02</span><span class="phil-name">Analytical Thinking</span></div>
+        <div class="phil-card"><span class="phil-tag">03</span><span class="phil-name">Logical Reasoning</span></div>
+        <div class="phil-card"><span class="phil-tag">04</span><span class="phil-name">Problem Solving</span></div>
+        <div class="phil-card"><span class="phil-tag">05</span><span class="phil-name">Learning Agility</span></div>
+        <div class="phil-card"><span class="phil-tag">06</span><span class="phil-name">Professional Behaviour</span></div>
+        <div class="phil-card"><span class="phil-tag">07</span><span class="phil-name">Cultural Alignment</span></div>
+        <div class="phil-card"><span class="phil-tag">08</span><span class="phil-name">Career Intentions</span></div>
+        <div class="phil-card"><span class="phil-tag">09</span><span class="phil-name">Long-term Stability</span></div>
+      </div>
+      <p class="quote-line" style="color:var(--red); margin-top:44px;">A great hire isn't just someone who can do the job. It's someone who belongs in the team.</p>
+    </div>
+  </section>
+
+  <section class="section-dark" id="process">
+    <div class="wrap reveal">
+      <div class="eyebrow">Our process</div>
+      <h2 class="section-title">Five stages. One steady pull, start to finish.</h2>
+      <p class="lede">No stage gets skipped, and no stage happens without you. Here's the line we walk every single search.</p>
+
+      <div class="process-scroll">
+        <div class="process-line">
+          <div class="rope-track"></div>
+
+          <div class="stage">
+            <div class="stage-knot">1</div>
+            <div class="stage-title">Understanding Your Business</div>
+            <ul class="stage-list">
+              <li>Company culture</li>
+              <li>Team dynamics</li>
+              <li>Hiring goals</li>
+              <li>Role expectations</li>
+            </ul>
+          </div>
+
+          <div class="stage">
+            <div class="stage-knot">2</div>
+            <div class="stage-title">Talent Mapping &amp; Sourcing</div>
+            <ul class="stage-list">
+              <li>Professional networks</li>
+              <li>Referrals</li>
+              <li>Internal database</li>
+              <li>Social &amp; passive outreach</li>
+              <li>Job portals</li>
+            </ul>
+          </div>
+
+          <div class="stage">
+            <div class="stage-knot">3</div>
+            <div class="stage-title">Candidate Assessment</div>
+            <ul class="stage-list">
+              <li>Resume evaluation</li>
+              <li>HR screening</li>
+              <li>Communication assessment</li>
+              <li>Analytical &amp; logical evaluation</li>
+              <li>Cultural fit assessment</li>
+            </ul>
+          </div>
+
+          <div class="stage">
+            <div class="stage-knot">4</div>
+            <div class="stage-title">Interview Coordination</div>
+            <ul class="stage-list">
+              <li>Scheduling</li>
+              <li>Candidate follow-ups</li>
+              <li>Feedback management</li>
+              <li>Offer coordination</li>
+              <li>Joining support</li>
+            </ul>
+          </div>
+
+          <div class="stage">
+            <div class="stage-knot">5</div>
+            <div class="stage-title">Post-Joining Support</div>
+            <ul class="stage-list">
+              <li>Onboarding assistance</li>
+              <li>Continuous communication</li>
+              <li>Replacement support*</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-light" id="industries">
+    <div class="wrap reveal">
+      <div class="eyebrow">Industries</div>
+      <h2 class="section-title">We pull talent from wherever it's standing.</h2>
+      <p class="lede grey-text">Different rooms, same rope. Here's where we've built teams before.</p>
+      <div class="chip-cloud">
+        <span class="chip">EdTech</span>
+        <span class="chip">SaaS</span>
+        <span class="chip">IT Services</span>
+        <span class="chip">Product Companies</span>
+        <span class="chip">Startups</span>
+        <span class="chip">BPO &amp; Contact Centers</span>
+        <span class="chip">Sales</span>
+        <span class="chip">Business Development</span>
+        <span class="chip">Human Resources</span>
+        <span class="chip">Operations</span>
+        <span class="chip">Customer Success</span>
+        <span class="chip">Marketing</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-dark" id="why">
+    <div class="wrap reveal">
+      <div class="eyebrow">Why Tuggr</div>
+      <h2 class="section-title">Companies choose Tuggr for the pull, not just the placement.</h2>
+
+      <div class="why-grid">
+        <div class="why-card"><span class="why-num">01</span><span class="why-title">Dedicated Recruiter</span></div>
+        <div class="why-card"><span class="why-num">02</span><span class="why-title">Quality-first Screening</span></div>
+        <div class="why-card"><span class="why-num">03</span><span class="why-title">Transparent Communication</span></div>
+        <div class="why-card"><span class="why-num">04</span><span class="why-title">Faster Turnaround</span></div>
+        <div class="why-card"><span class="why-num">05</span><span class="why-title">Structured Candidate Assessment</span></div>
+        <div class="why-card"><span class="why-num">06</span><span class="why-title">Culture-first Hiring</span></div>
+        <div class="why-card"><span class="why-num">07</span><span class="why-title">Flexible Engagement Models</span></div>
+        <div class="why-card"><span class="why-num">08</span><span class="why-title">Long-term Hiring Partnerships</span></div>
+      </div>
+
+      <p class="quote-line">"We don't measure success by resumes shared. We measure it by successful hires."</p>
+    </div>
+  </section>
+
+  <section class="section-light" id="commitment">
+    <div class="wrap reveal" style="color:var(--black);">
+      <div class="eyebrow">Our commitment</div>
+      <h2 class="section-title">Three things we never let go of.</h2>
+      <div class="commit-grid">
+        <div class="commit-card" style="background:var(--white-dim);">
+          <h3 style="color:var(--black);">Quality</h3>
+          <p class="grey-text">Every profile is carefully evaluated before submission.</p>
+        </div>
+        <div class="commit-card" style="background:var(--white-dim);">
+          <h3 style="color:var(--black);">Transparency</h3>
+          <p class="grey-text">Clear communication throughout the hiring journey.</p>
+        </div>
+        <div class="commit-card" style="background:var(--white-dim);">
+          <h3 style="color:var(--black);">Partnership</h3>
+          <p class="grey-text">We work as an extension of your internal talent team.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-section" id="contact">
+    <div class="wrap reveal">
+      <div class="contact-inner">
+        <div class="contact-left">
+          <div class="eyebrow">Let's talk</div>
+          <h2 class="section-title">Let's build great teams together.</h2>
+          <p class="lede">Whether you're hiring your first employee or your hundredth, Tuggr is committed to making recruitment simpler, faster, and more reliable.</p>
+        </div>
+        <div class="contact-card">
+          <div class="name">Akshansh Singh</div>
+          <div class="role">Founder, Tuggr</div>
+          <a href="mailto:akshansh.singh@tuggr.in">akshansh.singh@tuggr.in</a>
+          <a href="https://www.tuggr.in" target="_blank" rel="noopener">www.tuggr.in</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="rope on-dark"></div>
+
+<footer>
+  <div class="wrap foot-row">
+    <div class="foot-brand">
+      <img src="tuggr-logo.png" alt="" style="height:20px;width:auto;">
+      tuggr.in — we pull the right people forward
+    </div>
+    <div class="foot-tag">© 2026 Tuggr. Pulling potential forward.</div>
+  </div>
+</footer>
+
+<script>
+  // header scroll state
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // mobile menu
+  const burger = document.getElementById('burgerBtn');
+  const closeMenu = document.getElementById('closeMenu');
+  const mobileMenu = document.getElementById('mobileMenu');
+  burger.addEventListener('click', () => mobileMenu.classList.add('open'));
+  closeMenu.addEventListener('click', () => mobileMenu.classList.remove('open'));
+  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
+
+  // tug slider
+  const slider = document.getElementById('tugSlider');
+  const fill = document.getElementById('tugFill');
+  const status = document.getElementById('tugStatus');
+  function updateTug(v){
+    fill.style.width = v + '%';
+    let text;
+    if (v < 15) text = 'Sourced';
+    else if (v < 35) text = 'Screened';
+    else if (v < 58) text = 'Interviewed';
+    else if (v < 82) text = 'Offer Extended';
+    else text = 'Colleague ✓';
+    status.textContent = text;
+    status.style.color = v >= 82 ? 'var(--red-2)' : 'var(--white)';
+  }
+  slider.addEventListener('input', e => updateTug(e.target.value));
+  updateTug(slider.value);
+
+  // scroll reveal
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
